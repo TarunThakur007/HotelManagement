@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HotelHub | Luxury Stays, Suites & Event Spaces</title>
+  <meta name="description" content="HotelHub is an advanced hotel reservation and hospitality management system for guests, staff, and administrators.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2222%22 font-size=%2222%22>🏨</text></svg>">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar" id="mainNavbar">
+    <div class="nav-container">
+      <div class="brand" id="brandLogo" onclick="switchTab('explore')">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 21h18M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Hotel<span class="brand-accent">Hub</span></span>
+          <span class="brand-tagline">LUXURY HOSPITALITY</span>
+        </div>
+      </div>
+
+      <!-- Center Nav Links -->
+      <nav class="nav-links">
+        <button class="nav-link active" id="navExplore" onclick="switchTab('explore')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Explore Hotels
+        </button>
+        <button class="nav-link" id="navRooms" onclick="switchTab('rooms')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"/></svg>
+          Rooms & Suites
+        </button>
+        <button class="nav-link" id="navEvents" onclick="switchTab('events')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+          Event Spaces
+        </button>
+        <button class="nav-link" id="navBookings" onclick="switchTab('bookings')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          My Bookings <span class="badge" id="myBookingsCount">0</span>
+        </button>
+        <button class="nav-link role-tab staff-only" id="navStaff" onclick="switchTab('staff')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Staff Desk
+        </button>
+        <button class="nav-link role-tab admin-only" id="navAdmin" onclick="switchTab('admin')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Admin Hub
+        </button>
+      </nav>
+
+      <!-- Right Action Controls -->
+      <div class="nav-actions">
+        <!-- Live API Status Indicator -->
+        <div class="api-pill" id="apiStatusPill" onclick="toggleApiStatusModal()" title="Click to view API / Server connection info">
+          <span class="status-dot online" id="statusDot"></span>
+          <span class="status-text" id="statusText">Live API</span>
+        </div>
+
+        <!-- Currency Selector -->
+        <select class="currency-select" id="currencySelector" onchange="changeCurrency(this.value)" title="Change Currency">
+          <option value="USD">$ USD</option>
+          <option value="EUR">€ EUR</option>
+          <option value="GBP">£ GBP</option>
+          <option value="INR">₹ INR</option>
+        </select>
+
+        <!-- Notification Bell -->
+        <div class="notif-wrapper">
+          <button class="icon-btn" id="notifBellBtn" onclick="toggleNotifications()" title="Notifications">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="notif-badge" id="notifBadge">3</span>
+          </button>
+          
+          <!-- Notifications Popover -->
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <h4>System Notifications</h4>
+              <button class="text-btn" onclick="markAllNotificationsRead()">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notifList">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+        </div>
+
+        <!-- User Authentication & Profile Menu -->
+        <div class="auth-buttons" id="authLoggedOut">
+          <button class="btn btn-secondary" onclick="openAuthModal('login')">Sign In</button>
+          <button class="btn btn-primary" onclick="openAuthModal('register')">Register</button>
+        </div>
+
+        <div class="user-profile" id="authLoggedIn" style="display: none;">
+          <div class="user-chip" onclick="toggleUserMenu()">
+            <div class="avatar" id="userAvatar">JD</div>
+            <div class="user-info-text">
+              <span class="user-name" id="userDisplayName">John Doe</span>
+              <span class="user-role-badge" id="userRoleBadge">GUEST</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          <div class="user-menu" id="userMenu">
+            <div class="user-menu-header">
+              <p class="user-email" id="userDisplayEmail">user@example.com</p>
+            </div>
+            <hr>
+            <button class="menu-item" onclick="switchRole('GUEST')">Switch to Guest View</button>
+            <button class="menu-item" onclick="switchRole('STAFF')">Switch to Staff View</button>
+            <button class="menu-item" onclick="switchRole('ADMIN')">Switch to Admin View</button>
+            <hr>
+            <button class="menu-item danger" onclick="handleLogout()">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Banner -->
+  <div class="demo-banner" id="demoBanner">
+    <div class="demo-banner-content">
+      <span>✨ <strong>Smart Mode:</strong> Seamlessly auto-syncs with Spring Boot on port 8009 or runs in interactive standalone demo mode!</span>
+      <div class="demo-quick-switch">
+        <span>Quick role switch:</span>
+        <button class="chip-btn" onclick="quickLoginAs('guest')">Guest</button>
+        <button class="chip-btn" onclick="quickLoginAs('staff')">Staff</button>
+        <button class="chip-btn" onclick="quickLoginAs('admin')">Admin</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+
+    <!-- ==================== TAB 1: EXPLORE HOTELS ==================== -->
+    <section class="tab-pane active" id="tab-explore">
+      <!-- Hero Showcase -->
+      <div class="hero-section">
+        <div class="hero-background" style="background-image: url('assets/hotel_hero.jpg');">
+          <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+          <div class="hero-badge">EXCLUSIVE LUXURY DESTINATIONS</div>
+          <h1 class="hero-title">Experience Hospitality at its Finest</h1>
+          <p class="hero-subtitle">Discover world-class resorts, boutique suites, and majestic venues tailored for unforgettable memories.</p>
+
+          <!-- Interactive Search Widget -->
+          <div class="search-widget" id="searchWidget">
+            <div class="search-item">
+              <label for="searchCity">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Destination / City
+              </label>
+              <input type="text" id="searchCity" placeholder="Where are you heading?" value="Miami">
+            </div>
+
+            <div class="search-item">
+              <label for="searchCheckIn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Check-In
+              </label>
+              <input type="date" id="searchCheckIn">
+            </div>
+
+            <div class="search-item">
+              <label for="searchCheckOut">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Check-Out
+              </label>
+              <input type="date" id="searchCheckOut">
+            </div>
+
+            <div class="search-item">
+              <label for="searchGuests">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Guests
+              </label>
+              <select id="searchGuests">
+                <option value="1">1 Guest</option>
+                <option value="2" selected>2 Guests</option>
+                <option value="3">3 Guests</option>
+                <option value="4">4+ Guests</option>
+              </select>
+            </div>
+
+            <button class="search-btn" id="btnRunSearch" onclick="handleSearch()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <span>Explore</span>
+            </button>
+          </div>
+
+          <!-- Quick Filters Pills -->
+          <div class="filter-pills">
+            <span class="filter-pill-label">Popular Searches:</span>
+            <button class="pill active" onclick="filterHotelsByQuick('all', this)">All Hotels</button>
+            <button class="pill" onclick="filterHotelsByQuick('Miami', this)">Miami</button>
+            <button class="pill" onclick="filterHotelsByQuick('New York', this)">New York</button>
+            <button class="pill" onclick="filterHotelsByQuick('Paris', this)">Paris</button>
+            <button class="pill" onclick="filterHotelsByQuick('Bali', this)">Bali</button>
+            <button class="pill" onclick="filterHotelsByQuick('near-me', this)">📍 Near Me</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotels Catalog Grid -->
+      <section class="content-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Featured Luxury Accommodations</h2>
+            <p class="section-desc">Hand-picked destinations providing unparalleled comfort, dining, and scenic views.</p>
+          </div>
+          <div class="view-actions">
+            <span class="hotels-count-badge" id="hotelsCounter">Showing 4 Hotels</span>
+            <button class="btn btn-secondary btn-sm" onclick="fetchHotelsFromBackend()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="hotels-grid" id="hotelsGrid">
+          <!-- Dynamic hotel cards injected here -->
+        </div>
+      </section>
+
+      <!-- Highlights Features Banner -->
+      <section class="features-bar">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="feature-details">
+            <h4>Best Rate Guarantee</h4>
+            <p>Direct bookings receive our lowest guaranteed rates and complimentary upgrades.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="feature-details">
+            <h4>Flexible Free Cancellation</h4>
+            <p>Plans change! Modify or cancel up to 24 hours prior to check-in with 100% refund.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div class="feature-details">
+            <h4>5-Star Concierge Service</h4>
+            <p>Dedicated staff available 24/7 to fulfill every dining, tour, or custom room request.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ==================== TAB 2: ROOMS & SUITES ==================== -->
+    <section class="tab-pane" id="tab-rooms">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h1>Suites & Available Rooms</h1>
+          <p>Select from luxury master suites, panoramic ocean villas, and deluxe guest rooms.</p>
+        </div>
+        <div class="rooms-filters">
+          <select id="filterRoomHotel" onchange="filterRooms()">
+            <option value="all">All Hotels</option>
+            <!-- Injected dynamically -->
+          </select>
+          <select id="filterRoomType" onchange="filterRooms()">
+            <option value="all">All Room Types</option>
+            <option value="DELUXE">Deluxe Room</option>
+            <option value="SUITE">Presidential Suite</option>
+            <option value="VILLA">Private Ocean Villa</option>
+            <option value="EXECUTIVE">Executive Room</option>
+          </select>
+          <select id="filterRoomStatus" onchange="filterRooms()">
+            <option value="all">Any Status</option>
+            <option value="AVAILABLE" selected>Available Only</option>
+            <option value="BOOKED">Booked</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="rooms-grid" id="roomsGrid">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: EVENT SPACES ==================== -->
+    <section class="tab-pane" id="tab-events">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h1>Grand Venues & Event Spaces</h1>
+          <p>Host prestigious galas, corporate summits, weddings, and executive banquets.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openEventInquiryModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Request Event Booking
+        </button>
+      </div>
+
+      <div class="events-grid" id="eventsGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: MY BOOKINGS (GUEST) ==================== -->
+    <section class="tab-pane" id="tab-bookings">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h1>Your Active & Past Bookings</h1>
+          <p>Review check-in details, view confirmations, and manage your hotel stays.</p>
+        </div>
+        <button class="btn btn-secondary" onclick="switchTab('explore')">Book Another Room</button>
+      </div>
+
+      <div class="bookings-container" id="bookingsContainer">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: STAFF DESK (STAFF ONLY) ==================== -->
+    <section class="tab-pane" id="tab-staff">
+      <div class="page-header">
+        <div class="page-header-text">
+          <div class="staff-tag">STAFF OPERATIONS PORTAL</div>
+          <h1>Front Desk & Room Status Management</h1>
+          <p>Update room availability, check-in status, and adjust daily room pricing.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddRoomModal()">+ Add New Room</button>
+      </div>
+
+      <div class="staff-dashboard-grid">
+        <div class="stat-card">
+          <span class="stat-label">Total Rooms</span>
+          <span class="stat-value" id="staffTotalRooms">12</span>
+          <span class="stat-sub">Across managed properties</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Available Now</span>
+          <span class="stat-value text-success" id="staffAvailRooms">8</span>
+          <span class="stat-sub">Ready for check-in</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Occupied Rooms</span>
+          <span class="stat-value text-primary" id="staffOccupiedRooms">4</span>
+          <span class="stat-sub">Active guests</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Maintenance</span>
+          <span class="stat-value text-warning" id="staffMaintRooms">0</span>
+          <span class="stat-sub">Housekeeping / Inspection</span>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Room Inventory & Quick Actions</h3>
+          <span class="table-hint">Click status pills or price to quickly edit</span>
+        </div>
+        <table class="data-table" id="staffRoomsTable">
+          <thead>
+            <tr>
+              <th>Room No</th>
+              <th>Hotel Name</th>
+              <th>Type</th>
+              <th>Capacity</th>
+              <th>Rate / Night</th>
+              <th>Current Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="staffRoomsTbody">
+            <!-- Dynamic rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 6: ADMIN HUB (ADMIN ONLY) ==================== -->
+    <section class="tab-pane" id="tab-admin">
+      <div class="page-header">
+        <div class="page-header-text">
+          <div class="admin-tag">ADMIN EXECUTIVE HUB</div>
+          <h1>System Control & Analytics</h1>
+          <p>Oversee all hotels, user accounts, reservations, and system configurations.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-secondary" onclick="openAddRoomModal()">+ Add Room</button>
+          <button class="btn btn-primary" onclick="openCreateHotelModal()">+ Create Hotel</button>
+        </div>
+      </div>
+
+      <div class="admin-stats-grid">
+        <div class="stat-card gradient-1">
+          <span class="stat-label">Total Hotels</span>
+          <span class="stat-value" id="adminTotalHotels">4</span>
+          <span class="stat-trend">Worldwide locations</span>
+        </div>
+        <div class="stat-card gradient-2">
+          <span class="stat-label">Total Reservations</span>
+          <span class="stat-value" id="adminTotalBookings">18</span>
+          <span class="stat-trend">+14% this month</span>
+        </div>
+        <div class="stat-card gradient-3">
+          <span class="stat-label">Total Revenue</span>
+          <span class="stat-value" id="adminTotalRevenue">$24,650</span>
+          <span class="stat-trend">Gross bookings</span>
+        </div>
+        <div class="stat-card gradient-4">
+          <span class="stat-label">Registered Users</span>
+          <span class="stat-value" id="adminTotalUsers">42</span>
+          <span class="stat-trend">Guests, Staff & Admins</span>
+        </div>
+      </div>
+
+      <div class="admin-tabs-section">
+        <div class="tabs-subnav">
+          <button class="subtab-btn active" onclick="switchAdminSubtab('hotels', this)">Managed Hotels</button>
+          <button class="subtab-btn" onclick="switchAdminSubtab('users', this)">User Management</button>
+          <button class="subtab-btn" onclick="switchAdminSubtab('all-bookings', this)">Global Bookings</button>
+        </div>
+
+        <div class="subtab-content active" id="subtab-hotels">
+          <div class="hotels-management-list" id="adminHotelsList">
+            <!-- Dynamic hotel cards with admin delete/edit -->
+          </div>
+        </div>
+
+        <div class="subtab-content" id="subtab-users">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>City</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTbody">
+                <!-- Dynamic user rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subtab-content" id="subtab-all-bookings">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Guest</th>
+                  <th>Room</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Amount</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminBookingsTbody">
+                <!-- Dynamic booking rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. Room Booking Modal -->
+  <div class="modal-backdrop" id="bookingModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-sub">CONFIRM RESERVATION</span>
+          <h3 id="modalRoomTitle">Book Room</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('bookingModal')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="booking-summary-strip">
+          <img id="modalRoomImage" src="assets/hotel_suite.jpg" alt="Room preview" class="modal-thumb">
+          <div class="modal-details">
+            <h4 id="modalHotelName">Grand Horizon Luxury Resort</h4>
+            <p id="modalRoomDetails">Presidential Suite • Room #401</p>
+            <div class="modal-pricing-tag">
+              <span class="price-val" id="modalPricePerNight">$450</span>
+              <span class="price-unit">/ night</span>
+            </div>
+          </div>
+        </div>
+
+        <form id="bookingForm" onsubmit="submitBooking(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookingCheckIn">Check-In Date</label>
+              <input type="date" id="bookingCheckIn" required onchange="recalculateBookingCost()">
+            </div>
+            <div class="form-group">
+              <label for="bookingCheckOut">Check-Out Date</label>
+              <input type="date" id="bookingCheckOut" required onchange="recalculateBookingCost()">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bookingGuestName">Guest Full Name</label>
+              <input type="text" id="bookingGuestName" placeholder="e.g. Eleanor Vance" required>
+            </div>
+            <div class="form-group">
+              <label for="bookingGuestEmail">Guest Email Address</label>
+              <input type="email" id="bookingGuestEmail" placeholder="e.g. eleanor@example.com" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="bookingSpecialRequests">Special Preferences / Requests</label>
+            <input type="text" id="bookingSpecialRequests" placeholder="e.g. High floor, extra feather pillows, early check-in">
+          </div>
+
+          <!-- Price Calculation Box -->
+          <div class="calculation-box">
+            <div class="calc-line">
+              <span id="calcNightRate">$450 × 3 nights</span>
+              <span id="calcBaseAmount">$1,350.00</span>
+            </div>
+            <div class="calc-line">
+              <span>Taxes & Hospitality Surcharge (12%)</span>
+              <span id="calcTaxAmount">$162.00</span>
+            </div>
+            <div class="calc-line text-success">
+              <span>HotelHub Member Discount (5%)</span>
+              <span id="calcDiscountAmount">-$67.50</span>
+            </div>
+            <hr class="calc-divider">
+            <div class="calc-line total-line">
+              <span>Total Price:</span>
+              <span class="total-price" id="calcTotalAmount">$1,444.50</span>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('bookingModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnConfirmBooking">Confirm & Book Now</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Auth Modal (Login / Register) -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-sub" id="authModalSub">WELCOME TO HOTELHUB</span>
+          <h3 id="authModalTitle">Sign In</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tab selector for Login / Register -->
+        <div class="auth-toggle-bar">
+          <button class="auth-toggle-btn active" id="authTabLogin" onclick="toggleAuthForm('login')">Sign In</button>
+          <button class="auth-toggle-btn" id="authTabRegister" onclick="toggleAuthForm('register')">Create Account</button>
+        </div>
+
+        <!-- Quick 1-Click Demo Login Bar -->
+        <div class="quick-demo-accounts">
+          <span class="quick-demo-title">Test 1-Click Login:</span>
+          <div class="quick-buttons">
+            <button class="chip-btn" onclick="fillAndLogin('guest')">Guest Demo</button>
+            <button class="chip-btn" onclick="fillAndLogin('staff')">Staff Demo</button>
+            <button class="chip-btn" onclick="fillAndLogin('admin')">Admin Demo</button>
+          </div>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" placeholder="guest@hotelhub.com" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('authModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnLoginSubmit">Sign In</button>
+          </div>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" onsubmit="handleRegisterSubmit(event)" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="regFirstName">First Name</label>
+              <input type="text" id="regFirstName" placeholder="Sophia" required>
+            </div>
+            <div class="form-group">
+              <label for="regLastName">Last Name</label>
+              <input type="text" id="regLastName" placeholder="Laurent" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Email Address</label>
+            <input type="email" id="regEmail" placeholder="sophia@example.com" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="regPassword">Password</label>
+              <input type="password" id="regPassword" placeholder="Minimum 6 characters" required>
+            </div>
+            <div class="form-group">
+              <label for="regCity">City</label>
+              <input type="text" id="regCity" placeholder="New York">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regRole">Account Role</label>
+            <select id="regRole">
+              <option value="GUEST" selected>Guest (Search & Book Rooms)</option>
+              <option value="STAFF">Staff (Front Desk & Room Status)</option>
+              <option value="ADMIN">Admin (Full Hotel & System Access)</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('authModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnRegisterSubmit">Create Account</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Create Hotel Modal (Admin) -->
+  <div class="modal-backdrop" id="createHotelModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-sub">ADMINISTRATION</span>
+          <h3>Add New Hotel Property</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('createHotelModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="createHotelForm" onsubmit="handleCreateHotelSubmit(event)">
+          <div class="form-group">
+            <label for="newHotelName">Hotel Name</label>
+            <input type="text" id="newHotelName" placeholder="e.g. The Azure Sands Resort" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newHotelCity">City</label>
+              <input type="text" id="newHotelCity" placeholder="Miami Beach" required>
+            </div>
+            <div class="form-group">
+              <label for="newHotelCountry">Country</label>
+              <input type="text" id="newHotelCountry" placeholder="United States" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="newHotelAddress">Street Address</label>
+            <input type="text" id="newHotelAddress" placeholder="100 Ocean Drive" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newHotelPhone">Phone</label>
+              <input type="text" id="newHotelPhone" placeholder="+1 (305) 555-0199">
+            </div>
+            <div class="form-group">
+              <label for="newHotelEmail">Hotel Email</label>
+              <input type="email" id="newHotelEmail" placeholder="reservations@azuresands.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="newHotelDesc">Description</label>
+            <textarea id="newHotelDesc" rows="3" placeholder="Pristine beachfront resort offering luxury cabanas, private pools, and world-class dining."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('createHotelModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create Property</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Add Room Modal (Admin/Staff) -->
+  <div class="modal-backdrop" id="addRoomModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-sub">ROOM INVENTORY</span>
+          <h3>Add New Room</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('addRoomModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addRoomForm" onsubmit="handleAddRoomSubmit(event)">
+          <div class="form-group">
+            <label for="addRoomHotelSelect">Assign To Hotel</label>
+            <select id="addRoomHotelSelect" required>
+              <!-- Injected dynamically -->
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="addRoomNumber">Room Number</label>
+              <input type="text" id="addRoomNumber" placeholder="e.g. 502" required>
+            </div>
+            <div class="form-group">
+              <label for="addRoomCapacity">Capacity (Guests)</label>
+              <input type="number" id="addRoomCapacity" min="1" max="10" value="2" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="addRoomPrice">Price Per Night ($)</label>
+              <input type="number" id="addRoomPrice" min="10" step="5" value="250" required>
+            </div>
+            <div class="form-group">
+              <label for="addRoomTypeSelect">Room Type</label>
+              <select id="addRoomTypeSelect">
+                <option value="DELUXE">Deluxe Room</option>
+                <option value="SUITE">Presidential Suite</option>
+                <option value="VILLA">Private Ocean Villa</option>
+                <option value="EXECUTIVE">Executive Room</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('addRoomModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add Room</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. API / Backend Connection Modal -->
+  <div class="modal-backdrop" id="apiModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="modal-sub">BACKEND ARCHITECTURE</span>
+          <h3>Backend Connectivity Status</h3>
+        </div>
+        <button class="modal-close" onclick="closeModal('apiModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="api-info-box">
+          <div class="info-row">
+            <span>Spring Boot API URL:</span>
+            <code id="apiBaseUrlDisplay">http://localhost:8009/api/v1</code>
+          </div>
+          <div class="info-row">
+            <span>Connection State:</span>
+            <strong id="apiConnectionState" class="text-success">Connected / Smart Sync</strong>
+          </div>
+          <div class="info-row">
+            <span>Database Engine:</span>
+            <code>H2 Database (MySQL Compatibility Mode)</code>
+          </div>
+        </div>
+
+        <p class="api-instructions">
+          If your Spring Boot backend is running (<code>mvn spring-boot:run</code> on port 8009), this frontend automatically executes live requests (JWT authentication, bookings, room status updates). If the server is offline, this frontend automatically serves rich simulated data so you can test every workflow seamlessly!
+        </p>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="testBackendConnection()">Ping Backend Now</button>
+          <button class="btn btn-primary" onclick="closeModal('apiModal')">Got It</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
